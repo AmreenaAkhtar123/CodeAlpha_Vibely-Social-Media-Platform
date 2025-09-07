@@ -6,16 +6,17 @@ const Navbar = () => {
 		<div>
 			<header className="text-white body-font bg-purple-900">
 				<div className="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
-					
-						<lord-icon
-							src="https://cdn.lordicon.com/qstkwfvt.json"
-							trigger="hover"
-							colors="primary:#ffffff,secondary:#ffffff"
-							style={{ width: "30px", height: "30px" }}
-						/>
-						<Link href="/" className="ml-3 text-3xl font-bold">VIBELY</Link>
-					
+
+					<lord-icon
+						src="https://cdn.lordicon.com/qstkwfvt.json"
+						trigger="hover"
+						colors="primary:#ffffff,secondary:#ffffff"
+						style={{ width: "30px", height: "30px" }}
+					/>
+					<Link href="/" className="ml-3 text-3xl font-bold">VIBELY</Link>
+
 					<nav className="md:ml-auto md:mr-auto flex flex-wrap items-center text-base justify-center">
+						<Link href="/home" className="mr-5 hover:text-red-400">Home</Link>
 						<Link href="/profile" className="mr-5 hover:text-red-400">Profile</Link>
 						<Link href="/register" className="mr-5 hover:text-red-400">Register</Link>
 						<Link href="/post" className="mr-5 hover:text-red-400">Create Post</Link>
