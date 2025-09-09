@@ -1,34 +1,26 @@
-// app/api/posts/route.js
 import { connectDB } from "@/lib/mongodb";
 import Post from "@/models/Post";
+import { authenticate } from "@/lib/middleware";
 
 export async function POST(req) {
   try {
     await connectDB();
-    const { userId, user, text, image } = await req.json();
 
-    // prefer userId, fallback to user
-    const userRef = userId || user;
-    if (!userRef || !text) {
-      return new Response(
-        JSON.stringify({ error: "user and text are required" }),
-        { status: 400 }
-      );
+    const auth = await authenticate(req);
+    if (auth.error) {
+      return new Response(JSON.stringify({ error: auth.error }), { status: auth.status });
     }
 
-    const newPost = await Post.create({ user: userRef, text, image });
-    return new Response(JSON.stringify(newPost), { status: 201 });
-  } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
-  }
-}
+    const { caption, image } = await req.json();
 
-export async function GET() {
-  try {
-    await connectDB();
-    const posts = await Post.find().populate("user", "username profilePic");
-    return new Response(JSON.stringify(posts), { status: 200 });
-  } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+    const newPost = await Post.create({
+      caption,
+      image,
+      user: auth.user.id,
+    });
+
+    return new Response(JSON.stringify(newPost), { status: 201 });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   }
 }
