@@ -2,12 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const { login } = useAuth(); // ✅ pull from AuthContext
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -23,8 +26,8 @@ export default function RegisterPage() {
       const data = await res.json();
 
       if (res.ok) {
-        // ✅ Save token in localStorage
-        localStorage.setItem("token", data.token);
+        // ✅ Save token in AuthContext + localStorage
+        login(data.user, data.token);
 
         alert("Registration successful!");
         window.location.href = "/"; // redirect to homepage

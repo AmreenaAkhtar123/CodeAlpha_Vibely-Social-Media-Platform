@@ -2,11 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const { login } = useAuth(); // ✅ pull login from AuthContext
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -22,8 +25,8 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (res.ok) {
-        // ✅ Save token in localStorage
-        localStorage.setItem("token", data.token);
+        // ✅ Save user in AuthContext
+        login(data.user, data.token);
 
         alert("Login successful!");
         window.location.href = "/"; // redirect to homepage
