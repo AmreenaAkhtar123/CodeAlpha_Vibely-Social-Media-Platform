@@ -23,17 +23,19 @@ export default function RootLayout({ children }) {
 	return (
 		<html lang="en">
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+				className={`${geistSans.variable} ${geistMono.variable} antialiased relative`}
 			>
 				<AuthProvider>
+					
+					{/* Background layer */}
+					<div className="fixed inset-0 -z-10 min-h-screen w-full [background:radial-gradient(125%_125%_at_50%_10%,#ffffff_40%,#6633ee_100%)]"></div>
 
-
-				<div className="absolute inset-0 -z-10 h-full w-full bg-white [background:radial-gradient(125%_125%_at_50%_10%,#fff_40%,#63e_100%)]">
-
-					<Navbar />
-					{children}
-					<Footer />
-				</div>
+					{/* Page content */}
+					<div className="relative flex flex-col min-h-screen">
+						<Navbar />
+						<main className="flex-grow">{children}</main>
+						<Footer />
+					</div>
 
 				</AuthProvider>
 

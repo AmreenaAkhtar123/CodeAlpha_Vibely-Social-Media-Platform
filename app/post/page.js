@@ -61,7 +61,7 @@ export default function CreatePostPage() {
   };
 
   return (
-    <div className="flex items-center justify-center mt-20 from-purple-200 via-pink-200 to-indigo-200">
+    <div className="flex items-center justify-center mt-20 from-purple-200 via-pink-200 to-indigo-200 ">
       <div className="bg-white/90 backdrop-blur-md shadow-2xl rounded-3xl p-8 w-140 border border-white/30">
         <h2 className="text-3xl font-extrabold text-center text-purple-800 mb-6">
           Create Post

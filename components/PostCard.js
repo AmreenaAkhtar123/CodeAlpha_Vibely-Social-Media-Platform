@@ -1,33 +1,39 @@
-"use client";
-
 export default function PostCard({ post }) {
   return (
-    <div className="bg-white/90 backdrop-blur-md shadow-2xl rounded-3xl p-6 md:p-8 max-w-2xl mx-auto my-6 border border-white/30">
-      
-      {/* Username */}
-      <h3 className="text-purple-800 font-extrabold text-xl md:text-2xl mb-3 tracking-wide">
-        @{post.username}
-      </h3>
+    <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-lg border border-gray-200 p-5 space-y-4">
+      {/* User Info */}
+      <div className="flex items-center space-x-3">
+        <img
+          src={post.user?.avatar || "https://via.placeholder.com/50"}
+          alt="avatar"
+          className="w-10 h-10 rounded-full object-cover border border-gray-300"
+        />
+        <h3 className="text-md font-semibold text-gray-800">
+          {post.user?.username || post.username}
+        </h3>
+      </div>
 
-      {/* Content */}
-      <p className="text-gray-800 text-base md:text-lg leading-relaxed mb-4">
-        {post.content}
-      </p>
+      {/* Post Content */}
+      <p className="text-gray-700 text-[15px] leading-relaxed">{post.content}</p>
 
-      {/* Image */}
-      {/* <img
-        src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80"
-        alt="Post"
-        className="w-full h-64 object-cover rounded-2xl mb-4"
-      /> */}
+      {/* Post Image */}
+      {post.image && (
+        <div className="rounded-xl overflow-hidden">
+          <img
+            src={post.image}
+            alt="Post"
+            className="w-full max-h-64 object-cover transition hover:scale-105 duration-300"
+          />
+        </div>
+      )}
 
-      {/* Likes and Comments */}
-      <div className="flex justify-between items-center text-sm md:text-base text-gray-600 font-semibold">
-        <span className="flex items-center gap-2 hover:text-purple-800 transition-colors duration-200 cursor-pointer">
-          ❤️ {post.likes} Likes
+      {/* Post Actions */}
+      <div className="flex justify-between items-center pt-2 text-gray-600 text-sm border-t border-gray-100">
+        <span className="cursor-pointer hover:text-purple-600">
+          LIKES👍 {post.likes || 0}
         </span>
-        <span className="flex items-center gap-2 hover:text-purple-800 transition-colors duration-200 cursor-pointer">
-          💬 {post.comments} Comments
+        <span className="cursor-pointer hover:text-purple-600">
+          COMMENTS💬 {post.comments || 0}
         </span>
       </div>
     </div>

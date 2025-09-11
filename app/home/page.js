@@ -1,28 +1,34 @@
+"use client";
+import { useEffect, useState } from "react";
 import PostCard from "@/components/PostCard";
 
-const samplePosts = [
-  {
-    id: "p1",
-    username: "meena",
-    content: "Hello world! This is my first post 🎉",
-    likes: 3,
-    comments: 1,
-  },
-  {
-    id: "p2",
-    username: "john_doe",
-    content: "Beautiful sunset today 🌅",
-    likes: 5,
-    comments: 2,
-  },
-];
-
 export default function HomePage() {
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const res = await fetch("/api/posts");
+        if (!res.ok) throw new Error("Failed to fetch posts");
+        const data = await res.json();
+        setPosts(data);
+      } catch (error) {
+        console.error("Error loading posts:", error);
+      }
+    };
+
+    fetchPosts();
+  }, []);
+
   return (
-    <div className="space-y-6 mt-6">
-      {samplePosts.map((post) => (
-        <PostCard key={post.id} post={post} />
-      ))}
+    <div className="flex justify-center mt-6 mb-30">
+      <div className="w-full max-w-2xl space-y-6">
+        {posts.length > 0 ? (
+          posts.map((post) => <PostCard key={post._id} post={post} />)
+        ) : (
+          <p className="text-center text-gray-500">No posts yet.</p>
+        )}
+      </div>
     </div>
   );
 }
