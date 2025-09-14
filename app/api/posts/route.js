@@ -42,7 +42,7 @@ export async function POST(req) {
     }
 
     const newPost = await Post.create({
-      user: req.user.id,
+      user: decoded.id,
       content,
       image: imageBase64,
     });
