@@ -5,14 +5,14 @@ import PostCard from "@/components/PostCard";
 
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
+  const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Same dummy avatar as Navbar
   const dummyAvatar =
     "https://api.dicebear.com/7.x/avataaars/svg?seed=meena";
 
   useEffect(() => {
-    async function fetchProfile() {
+    async function fetchProfileAndPosts() {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
@@ -20,15 +20,23 @@ export default function ProfilePage() {
           return;
         }
 
+        // ✅ Fetch profile
         const res = await fetch("/api/users/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
-
         const data = await res.json();
+
         if (res.ok) {
           setUser(data);
+
+          // ✅ Fetch user’s posts
+          const postsRes = await fetch("/api/users/me/posts", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const postsData = await postsRes.json();
+          if (postsRes.ok) {
+            setPosts(postsData);
+          }
         } else {
           console.error(data.error);
         }
@@ -39,7 +47,7 @@ export default function ProfilePage() {
       }
     }
 
-    fetchProfile();
+    fetchProfileAndPosts();
   }, []);
 
   if (loading) {
@@ -57,7 +65,7 @@ export default function ProfilePage() {
         <div className="bg-white/90 shadow-2xl rounded-3xl p-6 text-center">
           <div className="w-24 h-24 mx-auto rounded-full overflow-hidden border-4 border-purple-300 shadow-lg mt-5 mb-4">
             <img
-              src={user.avatar || dummyAvatar} 
+              src={user.avatar || dummyAvatar}
               alt="Avatar"
               className="w-full h-full object-cover"
             />
@@ -68,11 +76,15 @@ export default function ProfilePage() {
           <p className="text-gray-600 mb-4">{user.bio || "No bio yet."}</p>
         </div>
 
-        {/* Posts Section (later hook to API) */}
+        {/* Posts Section */}
         <div>
           <h3 className="text-xl font-bold text-gray-700 mb-4">Posts</h3>
           <div className="space-y-6">
-            {/* posts will be mapped here later */}
+            {posts.length > 0 ? (
+              posts.map((post) => <PostCard key={post._id} post={post} />)
+            ) : (
+              <p className="text-gray-500">No posts yet.</p>
+            )}
           </div>
         </div>
       </div>

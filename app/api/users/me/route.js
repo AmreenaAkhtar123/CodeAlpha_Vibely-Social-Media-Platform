@@ -1,34 +1,54 @@
 import { connectDB } from "@/lib/mongodb";
 import User from "@/models/User";
-import jwt from "jsonwebtoken";
+import { authenticate } from "@/lib/middleware";
 
+// ✅ GET: Fetch logged-in user profile
 export async function GET(req) {
   try {
+    const { user, error, status } = await authenticate(req);
+    if (error) {
+      return new Response(JSON.stringify({ error }), { status });
+    }
+
     await connectDB();
+    const dbUser = await User.findById(user.id).select("-password");
 
-    // ✅ Get token from headers
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-      });
+    if (!dbUser) {
+      return new Response(JSON.stringify({ error: "User not found" }), { status: 404 });
     }
 
-    const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    return new Response(JSON.stringify(dbUser), { status: 200 });
+  } catch (err) {
+    console.error("Profile GET error:", err);
+    return new Response(JSON.stringify({ error: "Server error" }), { status: 500 });
+  }
+}
 
-    const user = await User.findById(decoded.id).select("-password");
-    if (!user) {
-      return new Response(JSON.stringify({ error: "User not found" }), {
-        status: 404,
-      });
+// ✅ PUT: Update profile (bio, avatar)
+export async function PUT(req) {
+  try {
+    const { user, error, status } = await authenticate(req);
+    if (error) {
+      return new Response(JSON.stringify({ error }), { status });
     }
 
-    return new Response(JSON.stringify(user), { status: 200 });
-  } catch (error) {
-    console.error("Fetch me error:", error);
-    return new Response(JSON.stringify({ error: "Server error" }), {
-      status: 500,
-    });
+    await connectDB();
+    const body = await req.json();
+    const { bio, avatar } = body;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      user.id,
+      { bio, avatar },
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!updatedUser) {
+      return new Response(JSON.stringify({ error: "User not found" }), { status: 404 });
+    }
+
+    return new Response(JSON.stringify(updatedUser), { status: 200 });
+  } catch (err) {
+    console.error("Profile PUT error:", err);
+    return new Response(JSON.stringify({ error: "Failed to update profile" }), { status: 500 });
   }
 }
