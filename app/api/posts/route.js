@@ -6,10 +6,15 @@ import jwt from "jsonwebtoken";
 export async function GET() {
   try {
     await connectDB();
-    const posts = await Post.find().populate("user", "username avatar");
+    const posts = await Post.find()
+      .populate("user", "username avatar")
+      .sort({ createdAt: -1 }); // ✅ newest first
     return NextResponse.json(posts);
   } catch (err) {
-    return NextResponse.json({ error: "Failed to fetch posts" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch posts" },
+      { status: 500 }
+    );
   }
 }
 
@@ -18,7 +23,8 @@ export async function POST(req) {
     await connectDB();
 
     const token = req.headers.get("authorization")?.split(" ")[1];
-    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!token)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
@@ -36,14 +42,20 @@ export async function POST(req) {
     }
 
     const newPost = await Post.create({
-      user: decoded.id,
+      user: req.user.id,
       content,
       image: imageBase64,
     });
 
-    return NextResponse.json(newPost);
+    // ✅ populate before sending back
+    const populatedPost = await newPost.populate("user", "username avatar");
+
+    return NextResponse.json(populatedPost);
   } catch (err) {
     console.error("Post creation error:", err);
-    return NextResponse.json({ error: "Failed to create post" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to create post" },
+      { status: 500 }
+    );
   }
 }
