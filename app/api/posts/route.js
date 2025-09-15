@@ -2,19 +2,21 @@ import { connectDB } from "@/lib/mongodb";
 import Post from "@/models/Post";
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import User from "@/models/User";
 
 export async function GET() {
   try {
     await connectDB();
+
+    // ✅ Populate user data with profilePic + username
     const posts = await Post.find()
-      .populate("user", "username avatar")
-      .sort({ createdAt: -1 }); // ✅ newest first
-    return NextResponse.json(posts);
+      .populate("user", "username profilePic") // only fetch these fields
+      .sort({ createdAt: -1 });
+
+    return new Response(JSON.stringify(posts), { status: 200 });
   } catch (err) {
-    return NextResponse.json(
-      { error: "Failed to fetch posts" },
-      { status: 500 }
-    );
+    console.error("Posts fetch error:", err);
+    return new Response(JSON.stringify({ error: "Failed to fetch posts" }), { status: 500 });
   }
 }
 

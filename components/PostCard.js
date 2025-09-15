@@ -6,8 +6,8 @@ export default function PostCard({ post }) {
       {/* User Info */}
       <div className="flex items-center space-x-3">
         <img
-          src={post.user?.avatar || "https://via.placeholder.com/50"}
-          alt="avatar"
+          src={post.user?.profilePic || "/default-avatar.png"} 
+          alt={post.user?.username || "User avatar"}
           className="w-10 h-10 rounded-full object-cover border border-gray-300"
         />
         <div>

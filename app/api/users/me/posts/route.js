@@ -13,7 +13,7 @@ export async function GET(req) {
 
     const posts = await Post.find({ user: user.id })
       .sort({ createdAt: -1 }) // newest first
-      .populate("user", "username avatar");
+      .populate("user", "username profilePic"); // populate user data
 
     return new Response(JSON.stringify(posts), { status: 200 });
   } catch (err) {

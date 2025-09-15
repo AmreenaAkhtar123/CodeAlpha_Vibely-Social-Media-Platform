@@ -7,9 +7,7 @@ export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([]);
   const [bio, setBio] = useState("");
-  const [avatar, setAvatar] = useState(
-    localStorage.getItem("avatar") || "https://api.dicebear.com/7.x/avataaars/svg?seed=alpha"
-  );
+  const [profilePic, setProfilePic] = useState("");
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -42,11 +40,7 @@ export default function ProfilePage() {
 
   const dummyAvatar = "https://api.dicebear.com/7.x/avataaars/svg?seed=meena";
 
-  // Save avatar to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem("avatar", avatar);
-  }, [avatar]);
-
+  // Fetch profile + posts
   useEffect(() => {
     async function fetchProfileAndPosts() {
       const token = localStorage.getItem("token");
@@ -56,17 +50,17 @@ export default function ProfilePage() {
       }
 
       try {
-        // Fetch profile
-        const res = await fetch("/api/users/me", {
+        const res = await fetch("/api/profile", {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
+
         if (res.ok) {
-          setUser(data);
-          setBio(data.bio || "");
-          setAvatar(data.avatar || avatar);
-          
-          // Fetch user’s posts
+          setUser(data.user);
+          setBio(data.user.bio || "");
+          setProfilePic(data.user.profilePic || dummyAvatar);
+
+          // Fetch posts (expects populated user data)
           const postsRes = await fetch("/api/users/me/posts", {
             headers: { Authorization: `Bearer ${token}` },
           });
@@ -83,23 +77,24 @@ export default function ProfilePage() {
     fetchProfileAndPosts();
   }, []);
 
+  // Save profile changes
   const handleSave = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
 
     try {
-      const res = await fetch("/api/users/me", {
+      const res = await fetch("/api/profile", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ bio, avatar }),
+        body: JSON.stringify({ bio, profilePic }),
       });
 
       const data = await res.json();
       if (res.ok) {
-        setUser(data);
+        setUser(data.user);
         setEditing(false);
         alert("Profile updated!");
       } else {
@@ -120,8 +115,8 @@ export default function ProfilePage() {
         <div className="bg-white/90 shadow-2xl rounded-3xl p-6 text-center">
           <div className="w-24 h-24 mx-auto rounded-full overflow-hidden border-4 border-purple-300 shadow-lg mt-5 mb-4">
             <img
-              src={avatar || dummyAvatar}
-              alt="Avatar"
+              src={profilePic || dummyAvatar}
+              alt="Profile Pic"
               className="w-full h-full object-cover"
             />
           </div>
@@ -156,9 +151,9 @@ export default function ProfilePage() {
                   <img
                     key={img}
                     src={img}
-                    onClick={() => setAvatar(img)}
+                    onClick={() => setProfilePic(img)}
                     className={`w-16 h-16 rounded-full cursor-pointer border-4 ${
-                      avatar === img ? "border-purple-600" : "border-gray-300"
+                      profilePic === img ? "border-purple-600" : "border-gray-300"
                     }`}
                     title={img.split("seed=")[1]}
                   />
