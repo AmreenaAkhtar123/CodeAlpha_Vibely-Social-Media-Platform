@@ -1,3 +1,4 @@
+// app/api/auth/register/route.js
 import { connectDB } from "@/lib/mongodb";
 import User from "@/models/User";
 import bcrypt from "bcrypt";
@@ -31,10 +32,23 @@ export async function POST(req) {
       expiresIn: "1d",
     });
 
-    return new Response(JSON.stringify({ message: "User created", token }), {
-      status: 201,
-      headers: { "Content-Type": "application/json" },
-    });
+    // ✅ Return token and user (exclude password)
+    return new Response(
+      JSON.stringify({
+        message: "User created",
+        token,
+        user: {
+          id: newUser._id,
+          username: newUser.username,
+          email: newUser.email,
+          profilePic: newUser.profilePic || "",
+        },
+      }),
+      {
+        status: 201,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   }
