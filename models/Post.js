@@ -6,7 +6,7 @@ const PostSchema = new mongoose.Schema(
     content: { type: String, required: true },
     image: { type: String }, //  add this for base64 or URL
     //  Store actual user IDs
-    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User", default: [] }],
 
     //  Keep track of number of comments
     commentsCount: { type: Number, default: 0 },
