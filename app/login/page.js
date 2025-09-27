@@ -29,7 +29,7 @@ export default function LoginPage() {
         login(data.user, data.token);
 
         alert("Login successful!");
-        window.location.href = "/"; // redirect to homepage
+        window.location.href = "/home"; // redirect to homepage
       } else {
         alert(data.error || "Login failed");
       }
